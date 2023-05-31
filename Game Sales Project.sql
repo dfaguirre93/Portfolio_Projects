@@ -1,3 +1,31 @@
+--Top 10 best selling games each year of this century and final query for visualization
+SELECT *
+FROM 
+(
+	SELECT
+		Year_of_Release,
+		Name,
+		Platform,
+		Genre,
+		developer_new,
+		Global_Sales,
+		NA_Sales,
+		EU_Sales,
+		JP_Sales,
+		Other_Sales,
+		Critic_Score,
+		User_Score,
+		Rank () Over(Partition by Year_of_Release Order by Global_Sales DESC) as salesrank
+	FROM
+		PortfolioProject.dbo.Games
+		) as tbl
+WHERE (Year_of_Release BETWEEN 2000 and 2016) and salesrank <= 10
+Order by
+	Year_of_Release,
+	salesrank
+
+
+--Below are queries that were used to explore the data and gather insights before developing the final above query for visualization
 -----------------------------------
 --Data exploration
 
@@ -132,7 +160,7 @@ Order by
 	Partition by Year_of_Release
 	Order by Max(Global_Sales) DESC)
 
---Best selling game by year this century
+--Best selling game globally by year this century
 Select
 	top (1) with ties
 	Year_of_Release,
@@ -160,19 +188,117 @@ Order by
 	Partition by Year_of_Release
 	Order by max(Global_Sales) DESC)
 
---Top 10 best selling games of this century
+--Best selling NA game by year this century
+
 Select
+	top (1) with ties
+	Year_of_Release,
 	Name,
+	developer_new,
 	Platform,
 	Genre,
-	developer_new,
+	Max(NA_Sales) as total_sales,
 	Critic_Score,
-	User_Score,
-	Global_Sales
+	User_Score
 FROM
 	PortfolioProject.dbo.Games
 WHERE
-	Year_of_Release between 2000 and 20216
+	Year_of_Release between 2000 and 2016
+Group by
+	Year_of_Release,
+	Name,
+	developer_new,
+	Platform,
+	Genre,
+	Critic_Score,
+	User_Score
 Order by
-	Global_Sales DESC
-OFFSET 0 Rows Fetch First 10 Rows Only
+	Row_Number () over (
+	Partition by Year_of_Release
+	Order by max(NA_Sales) DESC)
+
+--Best selling EU game by year this century
+
+Select
+	top (1) with ties
+	Year_of_Release,
+	Name,
+	developer_new,
+	Platform,
+	Genre,
+	Max(EU_Sales) as total_sales,
+	Critic_Score,
+	User_Score
+FROM
+	PortfolioProject.dbo.Games
+WHERE
+	Year_of_Release between 2000 and 2016
+Group by
+	Year_of_Release,
+	Name,
+	developer_new,
+	Platform,
+	Genre,
+	Critic_Score,
+	User_Score
+Order by
+	Row_Number () over (
+	Partition by Year_of_Release
+	Order by max(EU_Sales) DESC)
+
+--Best selling JP game by year this century
+
+Select
+	top (1) with ties
+	Year_of_Release,
+	Name,
+	developer_new,
+	Platform,
+	Genre,
+	Max(JP_Sales) as total_sales,
+	Critic_Score,
+	User_Score
+FROM
+	PortfolioProject.dbo.Games
+WHERE
+	Year_of_Release between 2000 and 2016
+Group by
+	Year_of_Release,
+	Name,
+	developer_new,
+	Platform,
+	Genre,
+	Critic_Score,
+	User_Score
+Order by
+	Row_Number () over (
+	Partition by Year_of_Release
+	Order by max(JP_Sales) DESC)
+
+--Best selling Other game by year this century
+
+Select
+	Year_of_Release,
+	Name,
+	developer_new,
+	Platform,
+	Genre,
+	Max(Other_Sales) as total_sales,
+	Critic_Score,
+	User_Score
+FROM
+	PortfolioProject.dbo.Games
+WHERE
+	Year_of_Release between 2000 and 2016
+Group by
+	Year_of_Release,
+	Name,
+	developer_new,
+	Platform,
+	Genre,
+	Critic_Score,
+	User_Score
+Order by
+	Row_Number () over (
+	Partition by Year_of_Release
+	Order by max(Other_Sales) DESC)
